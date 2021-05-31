@@ -18,7 +18,13 @@
     <ClCompile Include="src.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="serv_func_impl.c">
+    <ClCompile Include="events_handling.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI_funcs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="procthread_funcs.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

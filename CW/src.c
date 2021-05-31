@@ -1,23 +1,36 @@
 #include "serv_func.h"
 
-int main()
-{	
-	NTSTATUS status;
-	FILE *dout_file;
-	if (fopen_s(&dout_file, "Processes.txt", "w")) report_err(_T("Warning: opening out file"), NULL);
+int WINAPI _tWinMain(HINSTANCE hInst, HINSTANCE hPrev_inst, PTCHAR lpCmd_line, int nCmd_show)
+{		
+	HWND hMain_window, hTree_container, hTree_view;
 
-	_putts(_T("Do you want to get detailed or general info? d - detailed, g - general"));
-	INFO_LEVEL_E info_level = getc(stdin) == 'd'? DEVELOPER: USER;
-
-
-	if (status = print_sys_info(dout_file, info_level))
+	PTCHAR ret_msg = init_app(&hMain_window, &hTree_container, &hTree_view, hInst);
+	if (_tcsicmp(ret_msg, _T("")))
 	{
-		if ((unsigned)status > 0x1E7)
-			_ftprintf(stderr, _T("Error: failed getting processes' info. Err code %X\n"), status);
-		else report_err(_T("Error: getting processes info"), NULL);
-	}
-	else
-		_putts(_T("Successed!"));
+		report_err(ret_msg, NULL, NULL);
+		return 1;
+	}	
 
-	fclose(dout_file);
+	GetDlgItem(hTree_view, TREE_VIEW_ID);
+
+	ShowWindow(hMain_window, SW_NORMAL);
+	UpdateWindow(hMain_window);
+
+	NTSTATUS status;
+	if (status = print_sys_info(stderr, hTree_container, hTree_view))
+	{
+		report_err(_T("print_sys_info"), hMain_window, status);
+		return status;
+	}
+
+	MSG msg = { 0 };
+	int iGetOk = 0;
+	while ((iGetOk = GetMessage(&msg, NULL, 0, 0)) != 0)
+	{
+		if (iGetOk == -1) return 3;		
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	return 0;
 }
