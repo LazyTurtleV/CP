@@ -145,21 +145,16 @@ NTSTATUS print_sys_info(FILE *stream_d, HWND hTree_container, HWND hTree_view)
 		pSys_proc_info = realloc(pSys_proc_info, buffer_size);
 	}
 
-	//save initial position 
-	PSYSTEM_PROCESS_INFORMATION pInitial_position = pSys_proc_info;
-
-	for (; pSys_proc_info->NextEntryOffset != NULL; pSys_proc_info = pSys_proc_info->NextEntryOffset + (PBYTE)pSys_proc_info)
+	for (PSYSTEM_PROCESS_INFORMATION pSys_info = pSys_proc_info; pSys_info->NextEntryOffset != NULL; pSys_info = pSys_info->NextEntryOffset + (PBYTE)pSys_info)
 	{
-		print_proc_info(pSys_proc_info, hTree_container, hTree_view);
+		print_proc_info(pSys_info, hTree_container, hTree_view);
 
-		PSYSTEM_THREAD_INFO_DETAILED_S sys_thread_info = pSys_proc_info + 1;
-		for (int count = 0; sys_thread_info < pSys_proc_info->NextEntryOffset + (PBYTE)pSys_proc_info && count < pSys_proc_info->NumberOfThreads; ++sys_thread_info, ++count)
+		PSYSTEM_THREAD_INFO_DETAILED_S sys_thread_info = pSys_info + 1;
+		for (int count = 0; sys_thread_info < pSys_info->NextEntryOffset + (PBYTE)pSys_info && count < pSys_info->NumberOfThreads; ++sys_thread_info, ++count)
 		{
 			print_thread_info(sys_thread_info, hTree_container, hTree_view);
 		}
 	}
-
-	pSys_proc_info = pInitial_position;
 
 	return status;
 }
